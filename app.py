@@ -34,11 +34,13 @@ st.markdown("""
 section[data-testid="stSidebar"] {
     background: linear-gradient(150deg, #81d4fa, #0284c7) !important;
 }
+
 .title {
     font-size: 30px;
     font-weight:700;
     text-align:center;
 }
+
 .card {
     background: rgba(255,255,255,0.9);
     border-radius:15px;
@@ -47,7 +49,6 @@ section[data-testid="stSidebar"] {
     transition: 0.3s;
 }
 
-/* 🔥 HOVER EFFECT */
 .card:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
@@ -60,7 +61,6 @@ section[data-testid="stSidebar"] {
     color:white;
 }
 
-/* RIWAYAT */
 .history-card {
     background: white;
     border-radius: 16px;
@@ -68,14 +68,17 @@ section[data-testid="stSidebar"] {
     margin-bottom: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+
 .history-label {
     font-weight: 700;
     font-size: 16px;
 }
+
 .history-meta {
     font-size: 13px;
     opacity: 0.7;
 }
+
 .history-badge {
     background: #16a34a;
     color: white;
@@ -92,9 +95,17 @@ section[data-testid="stSidebar"] {
 # MENU
 # ===========================
 with st.sidebar:
-    menu = st.selectbox("", ["Beranda", "Motif", "Klasifikasi", "Riwayat"])
 
+    menu = st.selectbox(
+        "",
+        ["Beranda", "Motif", "Klasifikasi", "Riwayat"]
+    )
+
+    # ===========================
+    # UPLOAD DATASET
+    # ===========================
     st.markdown("### Upload Dataset")
+
     uploaded_dataset = st.file_uploader(
         "Upload Dataset ZIP",
         type=["zip"]
@@ -109,6 +120,7 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout
 
 @st.cache_resource
 def load_model():
+
     base_model = EfficientNetB0(
         include_top=False,
         weights='imagenet',
@@ -159,7 +171,7 @@ def load_database(uploaded_zip=None):
     dataset_folder = "dataset_similarity"
 
     # ===========================
-    # UPLOAD DATASET ZIP
+    # JIKA ADA DATASET BARU
     # ===========================
     if uploaded_zip is not None:
 
@@ -167,7 +179,7 @@ def load_database(uploaded_zip=None):
         if os.path.exists(dataset_folder):
             shutil.rmtree(dataset_folder)
 
-        # simpan zip
+        # simpan zip sementara
         zip_path = "uploaded_dataset.zip"
 
         with open(zip_path, "wb") as f:
@@ -178,7 +190,7 @@ def load_database(uploaded_zip=None):
             zip_ref.extractall(dataset_folder)
 
     # ===========================
-    # VALIDASI
+    # VALIDASI DATASET
     # ===========================
     if not os.path.exists(dataset_folder):
         st.warning("Silakan upload dataset ZIP terlebih dahulu")
@@ -189,7 +201,7 @@ def load_database(uploaded_zip=None):
     paths = []
 
     # ===========================
-    # LOAD IMAGE
+    # LOAD DATASET
     # ===========================
     for label in os.listdir(dataset_folder):
 
@@ -219,7 +231,9 @@ def load_database(uploaded_zip=None):
 
     return np.array(features), labels, paths
 
+# ===========================
 # LOAD DATABASE
+# ===========================
 db_features, db_labels, db_paths = load_database(uploaded_dataset)
 
 # ===========================
@@ -304,11 +318,8 @@ if menu == "Beranda":
     st.markdown("### Deskripsi Sistem")
 
     st.info("""
-Aplikasi ini dibuat khusus untuk mengklasifikasikan motif batik berdasarkan gambar yang diunggah oleh pengguna.
-
+Aplikasi ini dibuat khusus untuk mengklasifikasikan motif batik berdasarkan gambar yang diunggah oleh pengguna. 
 Model yang digunakan adalah CNN EfficientNetB0.
-
-Terdapat 14 kelas motif batik yang dapat diklasifikasikan.
 """)
 
     st.markdown("### Cara Menggunakan")
